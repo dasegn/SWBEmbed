@@ -1,0 +1,78 @@
+<script src="${webPath}js/jquery.min.js" type="text/javascript"></script>
+
+#if($tmpl == "element")  
+    <script type="text/javascript">
+        $(document).ready(function() {
+            loadPreview("${idSlide}");
+        });
+        function loadPreview(url){
+            $.ajax({
+                url: 'http://www.slideshare.net/api/oembed/2?url='+url+'&maxwidth=926&maxheight=487&format=json',
+                dataType: 'jsonp',
+                success: function(data){
+                    $('#embedContent .ttl').append(data.title);
+                    $('#embedContent #embedElement').append(data.html);
+                    $('#sldData').append(data.author_name);
+                }
+            });
+        }
+    </script>
+
+    <div id="embedContent">
+        <h3 class="ttl"></h3>
+        <div id="embedElement" class="sombraSld">
+        </div>
+        <div id="sldData">
+        </div>
+    </div>
+#end
+
+#if($tmpl == "list")  
+    <script type="text/javascript">
+        $(document).ready(function() {
+            $( ".embedElement" ).each(function() {
+                var elem = $(this);
+                var embURL = $(this).children('.embedSrc').attr('href');
+        
+                $.ajax({
+                    url: 'http://www.slideshare.net/api/oembed/2?url='+embURL+'&format=json',
+                    dataType: 'jsonp',
+                    success: function(data){
+                        console.log(data);
+                        $(elem).find('.embedImg').attr('src', data.thumbnail);
+                        $(elem).find('.embedTitle').html(data.title);
+                        $(elem).find('.embedAuthor').html(data.author_name);                        
+                    }
+                });        
+            });
+        });
+    </script>
+
+
+    #foreach( $obj in $childs )
+       #foreach ($rec in $obj.listResources())
+            #set ($slide = $rec.getAttribute("idSlide"))
+            #if($slide)
+
+            <div class="moduloInt modEventos embedElement">
+                <a class="embedSrc" href="$slide">
+                    <img class="embedImg" src="" alt="">
+                </a>
+                <ul id="eventos">
+                    <li>
+                        <h4>                                     
+                            <a class="embedTitle" href="$obj.getUrl()">
+                                Clústers de innovación
+                            </a>
+                        </h4>
+                        <p class="hora embedAuthor"></p>
+                    </li>
+                </ul>
+            </div>
+                
+            
+            #end
+       #end
+    #end
+#end
+

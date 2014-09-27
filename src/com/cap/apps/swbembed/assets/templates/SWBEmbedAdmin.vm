@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8">
+    <title>SWBEmbed </title>
+    <!-- Bootstrap -->
+    <link href="${webPath}css/bootstrap.min.css" rel="stylesheet" media="screen" />
+    <link href="${webPath}css/bootstrap-theme.min.css" rel="stylesheet" media="screen" />
+    <script src="${webPath}js/jquery.min.js" type="text/javascript"></script>
+    <script src="${webPath}js/bootstrap.min.js" type="text/javascript"></script>
+    #if($tmpl == "element")  
+    <script type="text/javascript">
+        $(document).ready(function() {
+            var url = $('#idSlide').val();
+            if(url != '')
+                loadPreview(url);
+            $( "#idSlide" ).change(function(){
+                var url = $('#idSlide').val();
+                loadPreview(url);
+            });
+        });
+        function loadPreview(url){
+            $.ajax({
+                url: 'http://www.slideshare.net/api/oembed/2?url='+url+'&format=json',
+                dataType: 'jsonp',
+                success: function(data){
+                    console.log(data)
+                    $('#attr-list #embTitle').html('<strong>'+data.title+'</strong>');
+                    $('#attr-list #embThumbnail').html('<img src="'+data.thumbnail+'" />');
+                    $('#attr-list #embAutor').html(data.author_name);
+                    $('#attr-list #embTotalSld').html(data.total_slides);
+                },
+                error: function (xhr, ajaxOptions, thrownError) {
+
+                }   
+            });
+        }
+    </script>
+    #end
+  </head>
+  <body>
+    <div class="container-fluid">
+        <div class="page-header">
+          <h3>SWBEmbed Resource <small>configuración del recurso</small></h3>
+        </div>
+        #if($msg)
+        <div class="clearfix alert alert-success">
+          <a href="#" class="close" data-dismiss="alert">&times;</a>
+          <strong>¡Correcto!</strong> La información se ha actualizado existosamente 
+        </div>
+        #end
+        ${tmpl}
+        <form id="frmSWBEmbedResource" action="${actionURL}" type="POST" class="form-horizontal" role="form">            
+            <div class="form-group">
+                <label class="control-label col-sm-2 " for="tmpl">Plantilla del recurso</label>
+                <div class="col-sm-10">
+                    <select id="tmpl" name="tmpl" class="form-control">
+                        <option value="0">
+                            Seleccione una opción
+                        </option>
+                        <option #if($tmpl == "list") selected #end value="list">
+                            Lista de presentaciones
+                        </option>
+                        <option #if($tmpl == "element") selected #end value="element">
+                        Presentación individual
+                        </option>
+                    </select>
+                    <span class="help-block">Elija una plantilla para mostrar el recurso u opciones adicionales de configuración
+                    </span>
+                </div>                
+            </div>
+
+            #if($tmpl == "element")   
+            <div id="element-data">
+                <div class="form-group">
+                    <label class="control-label col-sm-2 " for="idSlide">URL de presentación SlideShare</label>
+                    <div class="col-sm-10">
+                        <input type="url" value="${idSlide}"class="form-control" id="idSlide" name="idSlide" placeholder="URL de presentación SlideShare" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div id="preview" class="col-md-9 col-md-offset-2">
+                      <div class="panel panel-default">
+                        <div class="panel-heading">Vista previa</div>
+                        <span class="glyphicon glyphicon-bookmark"></span>
+                        <div class="panel-body">
+                            <dl id="attr-list" class="dl-horizontal">
+                                <dt>Titulo</dt>
+                                <dd id="embTitle"></dd> 
+                                <dt>Thumbnail</dt>
+                                <dd id="embThumbnail"></dd>
+                                <dt>Autor</dt>
+                                <dd id="embAutor"></dd>                            
+                                <dt>Total de slides</dt>
+                                <dd id="embTotalSld"></dd>                                                                                   
+                            </dl>
+                        </div>
+                      </div>         
+                    </div>
+                </div>
+            </div>
+            #end
+            <div class="form-group">
+              <!-- Form Actions -->
+                <div class="col-sm-offset-2 col-sm-10">
+                  <button id="btnSave" type="submit" class="btn btn-default">Guardar</button>
+                </div>
+            </div>
+        </form>
+    </div>
+  </body>
+</html>
