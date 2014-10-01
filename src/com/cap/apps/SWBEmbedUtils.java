@@ -18,7 +18,9 @@ import java.util.Iterator;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import org.semanticwb.Logger;
+import org.semanticwb.SWBPortal;
 import org.semanticwb.SWBUtils;
+import org.semanticwb.model.Resource;
 import org.semanticwb.model.WebPage;
 
 /**
@@ -107,6 +109,34 @@ public class SWBEmbedUtils {
                                                      
         return sb.toString();        
     }   
+
+    public static String getWPath(Resource res){
+        String base = res.getResourceType().getWorkPath();
+        return SWBPortal.getWorkPath().replace("//", "/") + base+"/";
+    }
+    public static String getWebPath(Resource res){
+        String base = res.getResourceType().getWorkPath();
+        return SWBPortal.getWebWorkPath() + base+ "/";
+    }
+    
+    
+    public static boolean isNumber(String string){
+        try {
+            Long.parseLong(string);
+        } catch (Exception e){
+            return false;
+        }
+        return true;
+    }
+    public static int toInteger(String number, String pre){
+        int newNumber = 0;
+        if(isNumber(number)){
+            newNumber = Integer.parseInt(number);
+        } else {
+            newNumber = Integer.parseInt(pre);
+        }
+        return newNumber;
+    }
     
     // Haciendo la clase no instanciable
     private SWBEmbedUtils() { }    

@@ -48,7 +48,7 @@ public class SWBEmbed extends GenericAdmResource {
         try {
             VelocityContext context = new VelocityContext();           
             Resource base = paramsRequest.getResourceBase();
-            WebPage current = paramsRequest.getWebPage();
+            WebPage current = paramsRequest.getWebPage();            
             Iterator<WebPage> childs = current.listChilds("es", true, false, false, true, true);
             List<WebPage> ochilds = new ArrayList<WebPage>();
             while (childs.hasNext())
@@ -60,7 +60,8 @@ public class SWBEmbed extends GenericAdmResource {
             context.put("childs", ochilds);
             context.put("tmpl", base.getAttribute("tmpl", ""));
             context.put("idSlide", base.getAttribute("idSlide", ""));
-            runTemplate(response, context, "SWBEmbed");
+            SWBEmbedTemplates.buildTemplate(response, context, "SWBEmbed", base);
+            
         } catch (Exception e){
             log.error("Ocurrió un error en la construcción de la vista del rescurso:\n "+e.getMessage());
             e.printStackTrace();
@@ -76,7 +77,7 @@ public class SWBEmbed extends GenericAdmResource {
             context.put("actionURL", url);            
             context.put("msg", request.getParameter("msg"));
             context.put("idSlide", base.getAttribute("idSlide",""));      
-            runTemplate(response, context, "SWBEmbedAdmin");          
+            SWBEmbedTemplates.buildTemplate(response, context, "SWBEmbedAdmin", base);
         } catch(Exception e){
             log.error("Ocurrió un error durante la construcción de la vista de administración. "+e.getMessage()); 
             e.printStackTrace();
@@ -99,40 +100,7 @@ public class SWBEmbed extends GenericAdmResource {
             log.error(e);
         }
     }    
-    public void runTemplate(HttpServletResponse response, VelocityContext ctx, String tplName){
-        StringWriter sw = new StringWriter();
-        try {
-            out = response.getWriter();
-            ctx.put("webPath", getWebPath());
-            Template tmpl = prepareTemplate(tplName + ".vm");
-            tmpl.merge(ctx, sw);            
-            out.println(sw); 
-            out.close();
-        } catch(IOException e){
-            log.error("Ocurrió un error durante la ejecución de la vista "+ tplName +"  \n "+e.getMessage()); 
-            e.printStackTrace();            
-        }
-    }
-        
-    public Template prepareTemplate(String name){
-        Template tmpl = null;
-        try {
-            VelocityEngine ve = new VelocityEngine();
-            Properties p = new Properties();
-            p.setProperty( RuntimeConstants.RUNTIME_LOG_LOGSYSTEM_CLASS,"org.apache.velocity.runtime.log.Log4JLogChute" );
-            p.setProperty("runtime.log.logsystem.log4j.logger","SWBEmbed.class");
-            p.setProperty("resource.loader", "file");
-            p.setProperty("file.resource.loader.class", "org.apache.velocity.runtime.resource.loader.FileResourceLoader");
-            p.setProperty("file.resource.loader.path", getWPath() + "templates");
-            p.setProperty("file.resource.loader.cache", "false");
-            ve.init(p);
-            tmpl = ve.getTemplate(name, "UTF-8");                   
-        } catch(Exception e){
-            log.error("Ocurrió un error en el armado de la plantilla:\n "+e.getMessage());
-            e.getStackTrace();
-        }
-        return tmpl;
-    }
+
     
     @Override
     public void install(ResourceType resourceType) throws SWBResourceException {  
@@ -199,15 +167,8 @@ public class SWBEmbed extends GenericAdmResource {
         }
     }
     
-    public String getWPath(){
-        String base = this.getResourceBase().getResourceType().getWorkPath();
-        return SWBPortal.getWorkPath().replace("//", "/") + base+"/";
-    }
-    public String getWebPath(){
-        String base = this.getResourceBase().getResourceType().getWorkPath();
-        return SWBPortal.getWebWorkPath() + base+ "/";
-    }
-    protected String getStack(Exception e){
+
+    protected static String getStack(Exception e){
         StringBuilder stck = new StringBuilder();
         stck.append("Mensaje: "+e.getMessage()+"\n");
         StackTraceElement[] trace = e.getStackTrace();
