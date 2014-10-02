@@ -6,10 +6,17 @@
 
 package com.cap.apps;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.jar.JarFile;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -38,13 +45,23 @@ public class SWBEmbedWidget extends GenericAdmResource {
     @Override
     public void doView(HttpServletRequest request, HttpServletResponse response, SWBParamRequest paramsRequest) throws SWBResourceException {
         try {
-            VelocityContext context = new VelocityContext();
+            VelocityContext context = new VelocityContext();                      
             Resource base = paramsRequest.getResourceBase();
-            WebPage hp = base.getWebSite().getHomePage();
-            String pages = SWBEmbedUtils.getPageChilds(hp, "- ");
+            String idPage = base.getAttribute("sitePage", base.getWebSite().getHomePage().getId());
+            WebPage selPage = base.getWebSite().getWebPage(idPage);
             
-            context.put("home", hp);
-            context.put("pages", pages);
+            Iterator<WebPage> childs = selPage.listChilds("es", true, false, false, true, true);
+            List<WebPage> ochilds = new ArrayList<WebPage>();
+            while (childs.hasNext())
+            {
+                WebPage child = childs.next();
+                ochilds.add(child);
+            }
+            
+            context.put("childs", ochilds);
+            context.put("pageItems", base.getAttribute("pageItems","0"));
+            context.put("newWindow", base.getAttribute("newWindow","0"));            
+             
             SWBEmbedTemplates.buildTemplate(response, context, "SWBEmbedWidget", base);
             
         } catch (Exception e){
@@ -60,9 +77,15 @@ public class SWBEmbedWidget extends GenericAdmResource {
         Resource base = getResourceBase();         
         try {            
             VelocityContext context = new VelocityContext();
-            context.put("actionURL", url);            
-            context.put("msg", request.getParameter("msg"));
+            WebPage hp = base.getWebSite().getHomePage();            
+            LinkedHashMap<String,String> pages = SWBEmbedPages.getPages(hp, "-");            
+            context.put("pages", pages);                    
+            context.put("actionURL", url);  
             
+            context.put("msg", request.getParameter("msg"));
+            context.put("sitePage", base.getAttribute("sitePage","0"));
+            context.put("pageItems", base.getAttribute("pageItems","0"));
+            context.put("newWindow", base.getAttribute("newWindow","0"));
             SWBEmbedTemplates.buildTemplate(response, context, "SWBEmbedWidgetAdmin", base);          
         } catch(Exception e){
             log.error("Ocurrió un error durante la construcción de la vista de administración. "+e.getMessage()); 

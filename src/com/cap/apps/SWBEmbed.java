@@ -56,7 +56,7 @@ public class SWBEmbed extends GenericAdmResource {
                 WebPage child = childs.next();
                 ochilds.add(child);
             }
-
+            
             context.put("childs", ochilds);
             context.put("tmpl", base.getAttribute("tmpl", ""));
             context.put("idSlide", base.getAttribute("idSlide", ""));

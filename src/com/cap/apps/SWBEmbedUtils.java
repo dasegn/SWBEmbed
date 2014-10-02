@@ -91,24 +91,7 @@ public class SWBEmbedUtils {
         }    
     }
     
-    public static String getPageChilds(WebPage page, String indent){
-        StringBuilder sb = new StringBuilder();
-        Iterator<WebPage>  it = page.listVisibleChilds(null);         
-        
-        if(it.hasNext()){
-            while(it.hasNext()) {
-                WebPage tp = it.next();                
-                if( null != tp ){
-                    sb.append(",{ 'value': '"+tp.getUrl() + "', 'name':'"+ indent + tp.getDisplayName() + "'}"); 
-                    if(tp.listVisibleChilds(null).hasNext()){
-                        sb.append(getPageChilds(tp, indent + "- "));                      
-                    }
-                }
-            }
-        }        
-                                                     
-        return sb.toString();        
-    }   
+
 
     public static String getWPath(Resource res){
         String base = res.getResourceType().getWorkPath();

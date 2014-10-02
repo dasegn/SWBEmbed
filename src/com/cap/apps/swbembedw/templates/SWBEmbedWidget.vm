@@ -1,0 +1,25 @@
+    #foreach( $obj in $childs )
+       #foreach ($rec in $obj.listResources())
+            #set ($slide = $rec.getAttribute("idSlide"))
+            #if($slide)
+
+            <div class="moduloInt modEventos embedElement">
+                <a class="embedSrc" href="$slide">
+                    <img class="embedImg" src="" alt="">
+                </a>
+                <ul id="eventos">
+                    <li>
+                        <h4>                                     
+                            <a class="embedTitle" href="$obj.getUrl()">
+                                Clústers de innovación
+                            </a>
+                        </h4>
+                        <p class="hora embedAuthor"></p>
+                    </li>
+                </ul>
+            </div>
+                
+            
+            #end
+       #end
+    #end
