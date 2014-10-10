@@ -10,8 +10,8 @@
                 url: 'http://www.slideshare.net/api/oembed/2?url='+url+'&maxwidth=926&maxheight=487&format=json',
                 dataType: 'jsonp',
                 success: function(data){
-                    $('#embedContent .ttl').append(data.title);
-                    $('#embedContent #embedElement').append(data.html);
+                    //$('#embedContent .ttl').append(data.title);
+                    $('#embedContent #embedElement').empty().append($(data.html).filter('iframe'));
                     $('#sldData').append(data.author_name);
                 }
             });
@@ -19,7 +19,6 @@
     </script>
 
     <div id="embedContent">
-        <h3 class="ttl"></h3>
         <div id="embedElement" class="sombraSld">
         </div>
         <div id="sldData">
@@ -32,13 +31,11 @@
         $(document).ready(function() {
             $( ".embedElement" ).each(function() {
                 var elem = $(this);
-                var embURL = $(this).children('.embedSrc').attr('href');
-        
+                var embURL = $(elem).find('.embedImg').attr('src');
                 $.ajax({
                     url: 'http://www.slideshare.net/api/oembed/2?url='+embURL+'&format=json',
                     dataType: 'jsonp',
                     success: function(data){
-                        console.log(data);
                         $(elem).find('.embedImg').attr('src', data.thumbnail);
                         $(elem).find('.embedTitle').html(data.title);
                         $(elem).find('.embedAuthor').html(data.author_name);                        
@@ -55,14 +52,14 @@
             #if($slide)
 
             <div class="moduloInt modEventos embedElement">
-                <a class="embedSrc" href="$slide">
-                    <img class="embedImg" src="" alt="">
+                <a class="embedSrc" href="$obj.getUrl()">
+                    <img alt="Imagen SlideShare Presentation" class="embedImg" src="$slide" />
                 </a>
                 <ul id="eventos">
                     <li>
                         <h4>                                     
                             <a class="embedTitle" href="$obj.getUrl()">
-                                Clústers de innovación
+                                $obj.getTitle()
                             </a>
                         </h4>
                         <p class="hora embedAuthor"></p>

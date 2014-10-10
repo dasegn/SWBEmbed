@@ -1,25 +1,43 @@
+    <script type="text/javascript">
+        $(document).ready(function() {
+            $( ".embedElement" ).each(function() {
+                var elem = $(this);
+                var embURL = $(elem).find('.embedImg').attr('src');
+                $.ajax({
+                    url: 'http://www.slideshare.net/api/oembed/2?url='+embURL+'&format=json',
+                    dataType: 'jsonp',
+                    success: function(data){
+                        $(elem).find('.embedImg').attr('src', data.thumbnail);
+                        $(elem).find('.embedTitle').html(data.title);
+                        $(elem).find('.embedAuthor').html(data.author_name);                        
+                    }
+                });        
+            });
+        });
+    </script>
+
+ <div class="sliderPresen">    
     #foreach( $obj in $childs )
        #foreach ($rec in $obj.listResources())
             #set ($slide = $rec.getAttribute("idSlide"))
             #if($slide)
 
-            <div class="moduloInt modEventos embedElement">
-                <a class="embedSrc" href="$slide">
-                    <img class="embedImg" src="" alt="">
+            <div class="itemPresen embedElement">
+                <a class="embedSrc" href="$obj.getUrl()">
+                    <img alt="Imagen SlideShare Presentation" class="embedImg" src="$slide" />
                 </a>
-                <ul id="eventos">
-                    <li>
-                        <h4>                                     
-                            <a class="embedTitle" href="$obj.getUrl()">
-                                Clústers de innovación
+                <span>
+                <a class="embedTitle" href="$obj.getUrl()">
+                                $obj.getTitle()
                             </a>
-                        </h4>
-                        <p class="hora embedAuthor"></p>
-                    </li>
-                </ul>
-            </div>
-                
-            
+                </span>
+            </div>                          
             #end
        #end
     #end
+</div>
+<div class="btnVer">
+    <a class="ver_mas" href="$urlPage">
+        Ver más
+    </a>
+</div>    

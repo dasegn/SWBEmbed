@@ -48,17 +48,18 @@ public class SWBEmbedWidget extends GenericAdmResource {
             VelocityContext context = new VelocityContext();                      
             Resource base = paramsRequest.getResourceBase();
             String idPage = base.getAttribute("sitePage", base.getWebSite().getHomePage().getId());
-            WebPage selPage = base.getWebSite().getWebPage(idPage);
             
+            WebPage selPage = base.getWebSite().getWebPage(idPage);
             Iterator<WebPage> childs = selPage.listChilds("es", true, false, false, true, true);
             List<WebPage> ochilds = new ArrayList<WebPage>();
             while (childs.hasNext())
             {
-                WebPage child = childs.next();
+                WebPage child = childs.next();                
                 ochilds.add(child);
             }
             
             context.put("childs", ochilds);
+            context.put("urlPage", selPage.getUrl());
             context.put("pageItems", base.getAttribute("pageItems","0"));
             context.put("newWindow", base.getAttribute("newWindow","0"));            
              
